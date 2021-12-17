@@ -1,4 +1,3 @@
-// ca2311caffb3fa11bb286497661accd339c073f7e64411a63ab49d010527b894
 
 let channelurl = localStorage.channelurl;
 let authkey = localStorage.auth;
