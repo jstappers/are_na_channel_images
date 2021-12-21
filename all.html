@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>are.na tab js</title>
+    <link rel="stylesheet" href="main.css">
+    <script>
+        
+            let channelurl = localStorage.channelurl;
+            let authkey = localStorage.auth;
+
+            let count = 0;
+
+
+            if (channelurl == "null" || channelurl == null) {
+                let channelurl = prompt("Channel url", "https://api.are.na/v2/channels/");
+                localStorage.setItem("channelurl", channelurl);
+            }
+
+            if (authkey == "null" || authkey == null) {
+                let authkey = prompt("Authentication", "");
+                localStorage.setItem("auth", authkey);
+            }
+
+            function setChannelUrl() {
+                let channelurl = prompt("Channel url", "https://api.are.na/v2/channels/");
+                localStorage.setItem("channelurl", channelurl);
+                location.reload();
+            }
+
+            function setAuthKey() {
+                let authkey = prompt("Authentication", "");
+                localStorage.setItem("auth", authkey);
+                location.reload();
+            }
+
+            function fisherYatesShuffle(arr) {
+                for (var i = arr.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1)); //random index
+                    [arr[i], arr[j]] = [arr[j], arr[i]]; // swap
+                }
+            }
+
+
+            async function fetchObjects() {
+                try {
+                    let res = await fetch(channelurl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + authkey
+                        }
+                    });
+                    return await res.json();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+
+            let contents;
+            async function renderObjects() {
+                
+                if (count < 1){
+
+                    
+                    let objects = await fetchObjects();
+                    contents = objects.contents;
+
+                    for (let i = contents.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        const temp = contents[i];
+                        contents[i] = contents[j];
+                        contents[j] = temp;
+                    }
+                    console.log('test');
+                }
+                console.log(contents)
+                
+                // const random = Math.floor(Math.random() * contents.length);
+                // let randomitem = (random, contents[random]);
+                let randomitem = contents[count];
+                let dateitem = Date.parse(randomitem.connected_at)
+
+                let image = randomitem.image.large.url;
+                let filesize = randomitem.image.original.file_size_display
+                console.log(image);
+                console.log(filesize);
+                document.getElementById("image").src = image;
+                document.getElementById("filesize").innerHTML = filesize;
+                document.getElementById("main-title").innerHTML = randomitem.title + "  |  ";
+                document.getElementById("sub-title").innerHTML = randomitem.source.title;
+                document.getElementById("date").innerHTML = randomitem.connected_at;
+                document.getElementById("channelbutton").innerHTML = channelurl;
+                console.log(count);
+
+                if (count < contents.length - 1) {
+                    count++;
+                }
+                else {
+                    count = 0;
+                }
+                console.log(count);
+
+            }
+
+            renderObjects();
+            setInterval(renderObjects, 5000);
+    </script>
+</head>
+
+<body>
+    <style>
+        *,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+    margin: 0;
+}
+
+
+
+body {
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+    grid-template-columns: 1fr;
+    grid-template-rows: 40px 1fr 40px;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    background-color: #f1f1f1;
+}
+
+#container {
+    grid-area: 2 / 1 / 3 / 2;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    /* background-color: aquamarine; */
+    overflow: hidden;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+img {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+    /* flex: auto;
+    width: 100%; */
+
+}
+
+.top-bar {
+    display: flex;
+    padding: 10px;
+    /* background-color: bisque; */
+    justify-content: space-between;
+    align-items: center;
+}
+
+#title {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+#sub-title {
+    color: grey;
+}
+
+.bottom-bar {
+    display: flex;
+    padding: 10px;
+    /* background-color: bisque; */
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+p {
+    font-size: 12px;
+    font-family: 'Karla';
+}
+
+.btn {
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Karla';
+    text-decoration: none;
+    border: none;
+    background: none;
+    text-decoration: underline;
+}
+
+#channelbutton {
+    justify-self: flex-start;
+}
+
+#authbutton {
+    justify-self: center;
+}
+
+#filesize {
+    justify-self: flex-end;
+}
+
+.btn:hover {
+    /* background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db); */
+    text-decoration: none;
+}
+    </style>
+    <div class="top-bar">
+        <div id="title">
+            <p><span id="main-title"></span><span id="sub-title"></span></p>
+            
+        </div>
+        <p id="date">13.11.1996</p>
+    </div>
+    
+    
+    
+    <div id="container">
+        <img src="" id="image"></img>
+    </div>
+    <div class="bottom-bar">
+        <button class="btn" onclick="setChannelUrl()" id="channelbutton"></button>
+        <button class="btn" onclick="setAuthKey()" id="authbutton">◼</button>
+        <p id="filesize">50 KB</p>
+    </div>
+
+</body>
+
+</html>
